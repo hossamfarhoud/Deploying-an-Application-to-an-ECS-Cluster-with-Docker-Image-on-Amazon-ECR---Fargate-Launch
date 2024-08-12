@@ -1,0 +1,25 @@
+# Push the Docker image created previously into the AWS ECR
+
+# From the AWS Console, go to ECR and Create a private Repository. Using the View Push Command, follow the commands (same instructions are available below)
+
+# Ensure your EC2 instance has an IAM role that has full access over ECR and EC2/ECS 
+
+# Retrieve an authentication token and authenticate the docker client to the registry
+
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 501486153610.dkr.ecr.us-east-1.amazonaws.com/ecrtest
+
+# WARNING! Your password will be stored unencrypted in /root/.docker/config.json. Configure a credential helper to remove this warning. See
+# https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+
+# You should see the message "Login Succeeded"
+
+# Tag the image latest version with the tag "test" so we can push it to the repository
+
+docker tag <image-name>:latest 501486153610.dkr.ecr.us-east-1.amazonaws.com/ecrtest:imagetag
+
+# Push the image to the ECR repository
+docker push 501486153610.dkr.ecr.us-east-1.amazonaws.com/ecrtest:imagetag
+
+
+# Move to the ECR dashboard and confirm that the image got pushed successfully.
+

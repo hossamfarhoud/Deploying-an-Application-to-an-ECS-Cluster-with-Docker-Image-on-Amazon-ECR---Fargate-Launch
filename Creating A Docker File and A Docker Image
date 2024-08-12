@@ -1,0 +1,97 @@
+# Docker Image & Creating A Docker Container HoL
+
+# Detailed instructions are available in the link below
+# https://docs.aws.amazon.com/AmazonECS/latest/developerguide/docker-basics.html 
+
+
+# Create an Amazon EC2 instance with a public IP address in a public subnet with the following user data script. Ensure the instance security group allows HTTP and HTTPS outbound.
+
+
+#!bin/bash
+yum update -y
+amazon-linux-extras install docker -y   ## if this did not work use  yum install docker -y
+systemctl start docker
+systemctl enable docker
+
+
+# Or you can do this manually following the steps below
+
+sudo su
+yum update -y
+
+# Install the most recent Docker engine package for AWS Linux 2
+amazon-linux-extras install docker -y     ## if this did not work use  yum install docker -y
+systemctl start docker
+
+# Ensure that docker daemon starts after each reboot
+
+systemctl enable docker
+
+######## verify that docker is running
+
+systemctl status docker
+
+
+
+#####################   Docker File Creation
+
+#  Now, create a Dockerfile using the docker commands 
+
+touch dockerfile
+
+# Edit the created dockerfile and paste the docker file content below
+
+nano dockerfile
+
+# Use the below Dockerfile (copy and paste the below)
+
+
+
+
+
+#### start of the dockerfile
+
+FROM ubuntu:18.04
+
+# Install dependencies
+RUN apt-get update && \
+ apt-get -y install apache2
+ 
+# Install apache and write hello world message
+RUN echo 'Hello From DolfinED!' > /var/www/html/index.html
+
+# Configure apache
+RUN echo '. /etc/apache2/envvars' > /root/run_apache.sh && \
+ echo 'mkdir -p /var/run/apache2' >> /root/run_apache.sh && \
+ echo 'mkdir -p /var/lock/apache2' >> /root/run_apache.sh && \ 
+ echo '/usr/sbin/apache2 -D FOREGROUND' >> /root/run_apache.sh && \ 
+ chmod 755 /root/run_apache.sh
+
+
+# expose port 80 on the container
+EXPOSE 80
+
+# run the web server 
+
+CMD /root/run_apache.sh
+
+### end of the docker file
+
+
+
+##################   Build the docker image
+
+sudo su
+
+cd /home/ec2-user/
+docker build -t <image-name> .
+
+# To verify the file was created correctly, run the command
+docker images
+
+# Now start your docker container using the image built
+docker run -t -p 80:80 <image-name>
+
+# Browse to your EC2 instance’s Public DNS hostname and you will see the message
+
+
